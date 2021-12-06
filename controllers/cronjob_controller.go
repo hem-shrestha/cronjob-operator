@@ -270,7 +270,7 @@ func (r *CronJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 		return ctrl.Result{}, nil
 	}
 	scheduledResult := ctrl.Result{RequeueAfter: nextRun.Sub(r.Now())} // save this so we can re-use it elsewhere
-	//log = log.WithValues("now", r.Now(), "next run", nextRun)
+	logrus.Debug("now", r.Now(), "next run", nextRun)
 
 	if missedRun.IsZero() {
 		logrus.Info("no upcoming scheduled times, sleeping until next")
@@ -278,7 +278,7 @@ func (r *CronJobReconciler) Reconcile(ctx context.Context, req ctrl.Request) (ct
 	}
 
 	// make sure we're not too late to start the run
-	//log = log.WithValues("current run", missedRun)
+	logrus.Debug("current run", missedRun)
 	tooLate := false
 	if cronJob.Spec.StartingDeadlineSeconds != nil {
 		tooLate = missedRun.Add(time.Duration(*cronJob.Spec.StartingDeadlineSeconds) * time.Second).Before(r.Now())
